@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from navigation.login import insert_credentials
 from navigation.select_date_range import select_date_range
+from navigation.click_each_nfse import click_each_nfse
 
 # Configure the logging
 log_file_path = get_log_file_path()
@@ -49,6 +50,8 @@ if __name__ == "__main__":
             # Filter data range
             select_date_range(driver, config_data['dataInicio'], config_data['dataFim'])
 
+            # click each nfse
+            click_each_nfse(driver)
 
         finally:
             driver.quit()

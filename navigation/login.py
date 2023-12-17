@@ -19,13 +19,11 @@ def insert_credentials(nav, username, password, captchaKey):
         
         # Press Enter after filling the captcha
         nav.find_element(By.ID, 'btnEntrar').send_keys(Keys.RETURN)
-        time.sleep(20)
         
         # Check if the 'NFSe Recebidas' link is visible, indicating successful login
         element = WebDriverWait(nav, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
         
         if element:
-            element.click()
             logging.info("Login efetuado com sucesso.")
         else:
             logging.error("Erro no login.")
