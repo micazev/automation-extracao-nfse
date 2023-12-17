@@ -1,6 +1,0 @@
-INFO:root:Início da automação
-INFO:root:Start Login
-INFO:root:estou aqui
-WARNING:urllib3.connectionpool:Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101399f10>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/e4f7b5b053eaf098a4cbca93bc714341
-WARNING:urllib3.connectionpool:Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101417160>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/e4f7b5b053eaf098a4cbca93bc714341
-WARNING:urllib3.connectionpool:Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1014172b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/e4f7b5b053eaf098a4cbca93bc714341
