@@ -5,16 +5,12 @@ import logging
 from config.config import get_log_file_path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from navigation.login import login_with_captcha
-
-# Use the log file path
-log_path = get_log_file_path()
-print(f"Log file path: {log_path}")
+from navigation.login import insert_credentials
+from navigation.select_date_range import select_date_range
 
 # Configure the logging
 log_file_path = get_log_file_path()
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
-
 # Load data from config.json
 def load_config_data():
     config_dir = os.path.join(os.path.dirname(__file__), 'config')
@@ -48,8 +44,11 @@ if __name__ == "__main__":
             driver.switch_to.frame("principal")
 
             # Login
-            logging.info("Start Login")
-            login_with_captcha(driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
+            insert_credentials(driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
+
+            # Filter data range
+            select_date_range(driver, config_data['dataInicio'], config_data['dataFim'])
+
 
         finally:
             driver.quit()
