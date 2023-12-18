@@ -14,8 +14,7 @@ def click_each_nfse(nav):
 
         # Count the number of rows
         row_count = len(table_rows)
-        print(f"Number of rows to click: {row_count}")
-        logging.info(f"Number of rows to click: {row_count}")
+        logging.info(f"Number of nfse: {row_count}")
 
         # Get the main window handle
         main_window_handle = nav.current_window_handle
@@ -25,8 +24,6 @@ def click_each_nfse(nav):
             first_column_item = row.find_element(By.XPATH, './td[@align="left" and contains(@class, "right")]/a')
             first_column_item_text = first_column_item.text
             first_column_item.click()
-            print("estou aqui!")
-            time.sleep(5)
 
             try:
                 # Wait for the new window to appear

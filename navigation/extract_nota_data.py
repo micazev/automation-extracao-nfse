@@ -4,8 +4,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.config import get_log_file_path
 import logging
-import logging
 import time
+import json
+
+def save_to_file(data, filename):
+    with open(filename, 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=2)
 
 def extract_nota_data(nav):
     try:
@@ -27,20 +31,26 @@ def extract_nota_data(nav):
 
         # Extracting dados_prestador
         prestador_data = {}
-        prestador_elements = soup.find('tbody', {'class': 'impressaoTabela tamTab100'})
+        prestador_table = soup.find('tbody', {'class': 'impressaoTabela tamTab100'})
 
-        if prestador_elements:
-            prestador_data['dados_prestador'] = str(prestador_elements)
+        if prestador_table:
+            prestador_rows = prestador_table.find_all('tr')
+            for row in prestador_rows:
+                label = row.find('td', {'class': 'impressaoLabel'})
+                value = row.find('span', {'class': 'impressaoCampo'})
+                if label and value:
+                    prestador_data[label.text.strip()] = value.text.strip()
 
-        # Print extracted data on the console
-        print("Dados da Nota:")
-        print(nota_data)
+        # Merge nota_data and prestador_data
+        combined_data = {**nota_data, **prestador_data}
 
-        print("\nDados do Prestador:")
-        print(prestador_data)
+        # Save combined_data to a file
+        filename = f"extracts/nota_{nota_data['Número da Nota']}.json"
+        save_to_file(combined_data, filename)
+        logging.info(f"Dados da Nota e do Prestador saved to {filename}")
 
-        return nota_data, prestador_data
+        return combined_data
 
     except Exception as e:
         logging.error(f"Error in extract_nota_data: {e}")
-        return {}, {}
+        return {}
