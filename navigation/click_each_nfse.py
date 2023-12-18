@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
+from navigation.extract_nota_data import extract_nota_data
 from bs4 import BeautifulSoup
 import logging
 import time
@@ -38,7 +39,7 @@ def click_each_nfse(nav):
                 nav.switch_to.window(new_window_handle)
 
                 # Perform actions on the new window (extract nota number, etc.)
-                extract_nota_number(nav, first_column_item_text)
+                extract_nota_data(nav)
 
             except (TimeoutException, StaleElementReferenceException, NoSuchElementException) as e:
                 logging.error(f"Error switching to new window: {e}")
@@ -54,23 +55,3 @@ def click_each_nfse(nav):
 
     except Exception as e:
         logging.error(f"Error in click_each_nfse: {e}")
-
-def extract_nota_number(nav, item_text):
-    try:
-        # Extracting details from the nota fiscal details page
-        page_source = nav.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
-
-        # Find the element with the specified class
-        nota_element = soup.find('td', {'class': 'impressaoTitulo'})
-
-        if nota_element:
-            nota_value = nota_element.text.strip()
-            print(f"Numero da Nota: {nota_value}")
-            logging.info(f"Numero da Nota: {nota_value}")
-
-        else:
-            logging.warning("Element with class 'impressaoTitulo' not found.")
-
-    except Exception as e:
-        logging.error(f"Error in extract_nota_fiscal_details: {e}")
