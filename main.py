@@ -2,13 +2,15 @@
 import os
 import json
 import time
-import logging
+import logging 
+from selenium.webdriver.common.by import By
 from config.config import get_log_file_path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from navigation.login import insert_credentials
 from navigation.select_date_range import select_date_range
 from navigation.click_each_nfse import click_each_nfse
+from utils import processar_datas, verifica_paginacao
 
 # Configure the logging
 log_file_path = get_log_file_path()
@@ -47,13 +49,20 @@ if __name__ == "__main__":
 
             # Login
             insert_credentials(driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
+            time.sleep
+            datas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
+            for periodo in datas:
+                logging.info(periodo)
+                data_inicio, data_fim = periodo
+                select_date_range(driver, data_inicio, data_fim)
+                click_each_nfse(driver)
+                while verifica_paginacao(driver):
+                    driver.find_element(By.XPATH, '//a[text()="Próximo"]').click()
+                    click_each_nfse(driver)
 
-            # Filter data range
-            select_date_range(driver, config_data['dataInicio'], config_data['dataFim'])
-            # click each nfse
-            click_each_nfse(driver)
 
         finally:
             driver.quit()
+            logging.info("operação finalizada.")
     else:
         logging.error("WebDriver not initialized. Exiting.")

@@ -15,18 +15,14 @@ logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
 def select_date_range(nav, dataInicio, dataFinal):
     try:
-        logging.info("Start Filter Data Range and extraction")
         element = WebDriverWait(nav, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
         element.click()
-        element = nav.find_element(By.XPATH, "//td[normalize-space()='CONSULTA DE NFSE RECEBIDAS']")
-        logging.info(element.text)
         date_values = split_strings(dataInicio, dataFinal)
 
         if date_values is not None:
             anoInicio, mesInicio, anoFinal, mesFinal = date_values
             print(anoInicio, mesInicio, anoFinal, mesFinal)
             insert_dates(nav, mesInicio, anoInicio, mesFinal, anoFinal)
-            time.sleep(20)
         else:
             logging.error("Error getting date values.")
 
@@ -45,19 +41,17 @@ def split_strings(dataInicio, dataFinal):
 
 def insert_dates(nav, initial_month, initial_year, final_month, final_year):
     try:
-        logging.info("insertion of dates")
+        logging.info("Start Filter Data Range and extraction")
         select_dropdown(nav, 'rMesCompetenciaCN', initial_month)
         select_dropdown(nav, 'rAnoCompetenciaCN', initial_year)
         select_dropdown(nav, 'rMesCompetenciaCN2', final_month)
         select_dropdown(nav, 'rAnoCompetenciaCN2', final_year)
-
         nav.find_element(By.ID, 'btnConsultar').send_keys(Keys.RETURN)
         
         # Wait for the "Nenhuma NFSe localizada" text to disappear
         WebDriverWait(nav, 10).until(
             EC.invisibility_of_element_located((By.XPATH, '//tr[@class="gridResultado1"]/td[contains(text(), "Nenhuma NFSe localizada.")]'))
         )
-        logging.info("Results loaded successfully")
 
     except (NoSuchElementException, TimeoutException) as e:
         logging.error(f"Error inserting dates and waiting: {e}")
