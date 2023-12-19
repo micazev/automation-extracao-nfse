@@ -1,6 +1,7 @@
 # main.py
 import os
 import json
+import time
 import logging
 from config.config import get_log_file_path
 from selenium import webdriver
@@ -35,8 +36,8 @@ def configure_webdriver():
 if __name__ == "__main__":
     config_data = load_config_data()
     driver = configure_webdriver()
-
     if driver:
+
         try:
             logging.info("Início da automação")
             driver.get('https://nfse.campinas.sp.gov.br/NotaFiscal/acessoSistema.php')
@@ -49,7 +50,6 @@ if __name__ == "__main__":
 
             # Filter data range
             select_date_range(driver, config_data['dataInicio'], config_data['dataFim'])
-
             # click each nfse
             click_each_nfse(driver)
 

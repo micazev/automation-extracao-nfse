@@ -2,14 +2,14 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from config.config import get_log_file_path
 import logging
-import time
 import json
 
 def save_to_file(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=2)
+
+from datetime import datetime
 
 def extract_nota_data(nav):
     try:
@@ -44,7 +44,11 @@ def extract_nota_data(nav):
         # Merge nota_data and prestador_data
         combined_data = {**nota_data, **prestador_data}
 
-        # Save combined_data to a file
+        # Display the extracted data on the screen
+        print("Extracted Data:")
+        print(json.dumps(combined_data, ensure_ascii=False, indent=2))
+
+        # Generate a unique filename with a timestamp
         filename = f"extracts/nota_{nota_data['Número da Nota']}.json"
         save_to_file(combined_data, filename)
         logging.info(f"Dados da Nota e do Prestador saved to {filename}")
