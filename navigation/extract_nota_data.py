@@ -11,13 +11,9 @@ def save_to_file(data, filename):
         file.write('\n') 
 
 def extract_nota_data(nav, column_item_text):
-    combined_data = {}  # Initialize a dictionary to store the extracted data
+    combined_data = {}  
 
     try:
-        # Wait until the element is present on the page
-        # nota_data_element_present = EC.presence_of_element_located((By.XPATH, '//td[@class="impressaoLabel" and text()="Número da Nota"]'))
-        # WebDriverWait(nav, 10).until(nota_data_element_present)
-
         # Extracting details from the nota fiscal details page
         page_source = nav.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
@@ -27,12 +23,8 @@ def extract_nota_data(nav, column_item_text):
                              'Endereço', 'Município', 'UF', 'Telefone']
 
         for label in labels_to_extract:
-            logging.info(label)
             label_element = soup.find('td', class_='impressaoLabel', string=lambda text: label in text)
-            logging.info(label_element)
             if label_element:
-                logging.info("checando td")
-                # Find the next sibling <td> with the class 'impressaoTitulo' within the same <tr>
                 data_element = label_element.find_next('td', class_='impressaoTitulo')
                 if not data_element:
                     logging.info("checando span")

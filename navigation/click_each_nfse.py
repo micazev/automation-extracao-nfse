@@ -1,33 +1,25 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from navigation.extract_nota_data import extract_nota_data
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from navigation.extract_nota_data import extract_nota_data
 import logging
-
-# def switch_to_window_with_pattern(driver, url_pattern):
-#     for handle in driver.window_handles:
-#         driver.switch_to.window(handle)
-#         if url_pattern in driver.current_url:
-#             return True  # Encontrou a janela com o padrão desejado
-#     return False  # Não encontrou nenhuma janela com o padrão
-    
-def switch_to_window_with_pattern(driver, url_pattern):
-    while url_pattern not in driver.current_url:
-            for window_handle in driver.window_handles:
-                driver.switch_to.window(window_handle)
-
-    for window_handle in driver.window_handles:
-        driver.switch_to.window(window_handle)
-        if url_pattern in driver.current_url:
-            return True  # Encontrou a janela com o padrão desejado
-
-    # Se não encontrar a janela, volta para a janela principal
-    driver.switch_to.window(main_window_handle)
-    driver.get(main_window_url)
-    return False  # Não encontrou nenhuma janela com o padrão
+from bs4 import BeautifulSoup
+import re
 
 
+def process_new_window(nav, current_window, nota_window_url_pattern):
+    try:
+        WebDriverWait(nav, 10).until(EC.number_of_windows_to_be(2))  # Wait for two windows to be available
+        window_handles = nav.window_handles
+        new_window_handle = [handle for handle in window_handles if handle != current_window][0]
+        nav.switch_to.window(new_window_handle)
+
+        # Continue with the rest of your code for the new window
+
+    except (TimeoutException, NoSuchElementException) as e:
+        logging.info("Switching back to the main window.")
+        nav.switch_to.window(current_window)
 
 def click_each_nfse(nav):
     main_window_url_pattern = "https://nfse.campinas.sp.gov.br/NotaFiscal/index.php?"
@@ -38,34 +30,43 @@ def click_each_nfse(nav):
         row_count = len(table_rows)
         logging.info(f"Number of nfse: {row_count}")
 
-        # Iterate through each row and click on the first column item
-        for index, row in enumerate(table_rows, start=1):
-            logging.info(f"Processing nota {index} of {row_count}")
+        current_window = nav.current_window_handle
+        
+        # Se houver notas
+        if row_count > 0:
+            nota_numbers = []
+            for row in table_rows:
+                nota_link = row.find_element(By.XPATH, './/td[@class="right"]/a[b]')
+                nota_number = re.search(r'\b(\d+)\b', nota_link.find_element(By.TAG_NAME, 'b').text)
+                if nota_number:
+                    nota_numbers.append(nota_number.group(1))
 
-            # Clica no link da nota
-            column_item = row.find_element(By.XPATH, f'./td[@align="left" and contains(@class, "right")]/a[{index}]')
-            column_item_text = column_item.text
-            logging.info(f"Início extração da nota: {column_item_text}")
-            column_item.click()
+            logging.info(f"Nota Numbers: {nota_numbers}")
 
-            # Verifica se a nova janela foi aberta
-            try:
-                switch_to_window_with_pattern(nav, nota_window_url_pattern)
-                WebDriverWait(nav, 10).until(EC.url_contains(nota_window_url_pattern))
-                extract_nota_data(nav, column_item_text)
-
-            except (TimeoutException, NoSuchElementException) as e:
-                logging.error(f"A janela da nota não foi encontrada. Error processing new window: {e}")
-
-            finally:
-                # if len(nav.window_handles) > 1:
-                    # logging.info("fechando janelas excedentes.")
-                #     nav.close()
-                logging.info("voltando a janela principal.")
-                switch_to_window_with_pattern(nav, main_window_url_pattern)
-                WebDriverWait(nav, 10).until(EC.url_contains(main_window_url_pattern))
-                logging.info("voltou.")
+            # Extrair dados de cada nota
+            for nota_number in nota_numbers:
+                logging.info(f"Processing nota {nota_number}")
+                nota_link = nav.find_element(By.XPATH, f'//a[b[text()="{nota_number}"]]')
+                max_attempts = 3
+                attempt = 0
+                while attempt < max_attempts:
+                    try:
+                        nav.execute_script("arguments[0].click();", nota_link)
+                        # Switch to the new window
+                        process_new_window(nav, current_window, nota_window_url_pattern)
+                        extract_nota_data(nav, nota_number)
+                        process_new_window(nav, current_window, main_window_url_pattern)
+                        # Switch to the 'principal' frame - o site é encapsulado em um frame
+                        nav.switch_to.frame("principal")
+                        break
+                    except Exception as e:
+                        logging.warning(f"Erro na tentativa {attempt + 1}: {str(e)}")
+                        attempt += 1
+                        if attempt < max_attempts:
+                            logging.info(f"{attempt} Tentativa de extrair dados.")
+                        else:
+                            logging.error("Dados da nota não foram extraídos após várias tentativas")
 
 
     except Exception as e:
-        logging.error(f"Tabela não encontrada. Error in click_each_nfse: {e}")
+        logging.error(f"Error in click_each_nfse: {e}")
