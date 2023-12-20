@@ -12,6 +12,7 @@ def insert_credentials(nav, username, password, captchaKey):
         wait_and_fill(nav, By.ID, 'rLogin', username)
         wait_and_fill(nav, By.ID, 'rSenha', password)
 
+
         # Ask the user to manually enter the captcha
         manual_captcha = input("Please enter the captcha manually: ")
 
@@ -22,11 +23,6 @@ def insert_credentials(nav, username, password, captchaKey):
         
         # Check if the 'NFSe Recebidas' link is visible, indicating successful login
         element = WebDriverWait(nav, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
-        
-        if element:
-            logging.info("Login efetuado com sucesso.")
-        else:
-            logging.error("Erro no login.")
 
     except Exception as e:
         logging.error(f"Error inserting credentials: {e}")

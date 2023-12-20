@@ -1,8 +1,26 @@
 import logging
 from datetime import datetime
+from time import sleep
 from dateutil.relativedelta import relativedelta
 from selenium.webdriver.common.by import By
 
+
+def retry_with_logging(function, *args, **kwargs):
+    attempt = 0
+    max_attempts = 3
+    delay=2
+    while attempt < max_attempts:
+        try:
+            return function(*args, **kwargs)
+        except Exception as e:
+            logging.warning(f"Error on attempt {attempt + 1}: {str(e)}")
+            attempt += 1
+            if attempt < max_attempts:
+                logging.info(f"{attempt} Retrying...")
+                sleep(delay) 
+            else:
+                logging.error("Max attempts reached. Unable to complete operation.")
+                raise  
 
 def processar_datas(data_inicio, data_fim):
     intervalo_meses = 5
@@ -29,3 +47,11 @@ def verifica_paginacao(nav):
     else: 
         logging.info(f'Há apenas uma página de notas para o período.')
     return len(elemento_paginacao) > 0
+
+def abrir_notas(driver):
+    from navigation.click_each_nfse import click_each_nfse
+
+    click_each_nfse(driver)
+    while verifica_paginacao(driver):
+        driver.find_element(By.XPATH, '//a[text()="Próximo"]').click()
+        click_each_nfse(driver)
