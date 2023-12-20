@@ -51,11 +51,8 @@ def click_each_nfse(nav):
             # Verifica se a nova janela foi aberta
             try:
                 switch_to_window_with_pattern(nav, nota_window_url_pattern)
-                logging.info("estou aqui")
                 WebDriverWait(nav, 10).until(EC.url_contains(nota_window_url_pattern))
-                logging.info("estou aqui")
-                extract_nota_data(nav)
-                logging.info("estou aqui")
+                extract_nota_data(nav, column_item_text)
 
             except (TimeoutException, NoSuchElementException) as e:
                 logging.error(f"A janela da nota não foi encontrada. Error processing new window: {e}")
