@@ -27,4 +27,6 @@ def verifica_paginacao(nav):
     elemento_paginacao = nav.find_elements(By.XPATH, '//a[contains(@href, "consultarNfseRecebida.php?pagina=")]')
     if len(elemento_paginacao) > 0:
         logging.info(f'Há paginação {len(elemento_paginacao)}')
+    else: 
+        logging.info(f'Há apenas uma página de notas para o período.')
     return len(elemento_paginacao) > 0

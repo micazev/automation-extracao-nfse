@@ -11,7 +11,6 @@ def save_to_file(data, filename):
 
 def extract_nota_data(nav):
     try:
-        logging.info("e ai beleza")
         # Wait until the element is present on the page
         nota_data_element_present = EC.presence_of_element_located((By.XPATH, '//td[@class="impressaoLabel" and text()="Número da Nota"]'))
         WebDriverWait(nav, 10).until(nota_data_element_present)
@@ -69,3 +68,6 @@ def extract_nota_data(nav):
     except Exception as e:
         logging.error(f"Error in extract_nota_data: {e}")
         return {}
+    
+    finally:
+        nav.close()

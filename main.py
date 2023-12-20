@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
             # Login
             insert_credentials(driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
-            time.sleep
+            # time.sleep(800)
             datas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
             for periodo in datas:
                 logging.info(periodo)
