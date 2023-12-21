@@ -4,12 +4,17 @@ from config.config import load_config_data, configure_webdriver
 from navigation.login import insert_credentials
 from navigation.select_date_range import select_date_range
 from utils import processar_datas, retry_with_logging, abrir_notas
+from twocaptcha import TwoCaptcha
+
     
 # Main
 if __name__ == "__main__":
     try:
         config_data = load_config_data()
         driver = configure_webdriver()
+        # print("oi")
+        # print(twocaptcha.__version__)
+        # print(dir(twocaptcha.TwoCaptcha))
 
         if driver:
             try:
@@ -20,10 +25,8 @@ if __name__ == "__main__":
                 driver.switch_to.frame("principal")
                 # Login
                 retry_with_logging(insert_credentials, driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
-                # time.sleep(800)
-                datas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
-                
-                for periodo in datas:
+                datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
+                for periodo in datas_processadas:
                     logging.info(f"Começando a extração do período: {periodo}")
                     data_inicio, data_fim = periodo
                     retry_with_logging(select_date_range, driver, data_inicio, data_fim)

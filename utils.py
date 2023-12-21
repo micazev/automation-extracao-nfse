@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 from dateutil.relativedelta import relativedelta
 from selenium.webdriver.common.by import By
@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 def retry_with_logging(function, *args, **kwargs):
     attempt = 0
     max_attempts = 3
-    delay=2
+    delay= 0
     while attempt < max_attempts:
         try:
             return function(*args, **kwargs)
@@ -22,23 +22,28 @@ def retry_with_logging(function, *args, **kwargs):
                 logging.error("Max attempts reached. Unable to complete operation.")
                 raise  
 
+
+
 def processar_datas(data_inicio, data_fim):
     intervalo_meses = 5
     formato_data = "%Y-%m"
     data_inicio = datetime.strptime(data_inicio, formato_data)
     data_fim = datetime.strptime(data_fim, formato_data)
+    
     datas_processadas = []
 
     while data_inicio < data_fim:
-        proxima_data = data_inicio + relativedelta(months=intervalo_meses)
+        proxima_data = data_inicio + timedelta(days=30 * intervalo_meses)
+        
         if proxima_data < data_fim:
             datas_processadas.append((data_inicio.strftime(formato_data), proxima_data.strftime(formato_data)))
-            data_inicio = proxima_data
         else:
             datas_processadas.append((data_inicio.strftime(formato_data), data_fim.strftime(formato_data)))
-            break
+
+        data_inicio = proxima_data
 
     return datas_processadas
+
 
 def verifica_paginacao(nav):
     elemento_paginacao = nav.find_elements(By.XPATH, '//a[contains(@href, "consultarNfseRecebida.php?pagina=")]')
