@@ -29,12 +29,11 @@ if __name__ == "__main__":
                 retry_with_logging(insert_credentials, driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
                 # time.sleep(1200)
                 datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
-                paginacao = verifica_paginacao(driver)
-
                 for periodo in datas_processadas:
                     logging.info(f"Começando a extração do período: {periodo}")
                     data_inicio, data_fim = periodo
                     retry_with_logging(select_date_range, driver, data_inicio, data_fim)
+                    paginacao = verifica_paginacao(driver)
                     if paginacao:
                         while verifica_paginacao(driver):
                             retry_with_logging(abrir_notas, driver)
