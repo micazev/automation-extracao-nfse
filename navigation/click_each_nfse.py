@@ -5,13 +5,12 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from navigation.extract_nota_data import extract_nota_data
 from utils import retry_with_logging
 import logging
-from bs4 import BeautifulSoup
 import re
 
 
 def process_new_window(nav, current_window, nota_window_url_pattern):
     try:
-        WebDriverWait(nav, 10).until(EC.number_of_windows_to_be(2))  # Wait for two windows to be available
+        WebDriverWait(nav, 1).until(EC.number_of_windows_to_be(2))  # Wait for two windows to be available
         window_handles = nav.window_handles
         new_window_handle = [handle for handle in window_handles if handle != current_window][0]
         nav.switch_to.window(new_window_handle)
@@ -47,7 +46,7 @@ def click_each_nfse(nav):
             nota_numbers = []
             for row in table_rows:
                 nota_link = row.find_element(By.XPATH, './/td[@class="right"]/a[b]')
-                WebDriverWait(nav, 10).until(lambda nav: nota_link.text.strip())
+                WebDriverWait(nav, 1).until(lambda nav: nota_link.text.strip())
                 nota_number = re.search(r'\b(\d+)\b', nota_link.find_element(By.TAG_NAME, 'b').text)
 
                 if nota_number:

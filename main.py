@@ -41,6 +41,7 @@ if __name__ == "__main__":
                             logging.info(f"Finalizada a extração da página.")
                     else:
                         retry_with_logging(abrir_notas, driver)
+
                     logging.info(f"Finalizada a extração do período: {periodo}")
 
             finally:
