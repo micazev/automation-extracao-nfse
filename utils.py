@@ -22,8 +22,6 @@ def retry_with_logging(function, *args, **kwargs):
                 logging.error("Max attempts reached. Unable to complete operation.")
                 raise  
 
-
-
 def processar_datas(data_inicio, data_fim):
     intervalo_meses = 5
     formato_data = "%Y-%m"

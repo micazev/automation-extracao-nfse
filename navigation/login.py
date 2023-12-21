@@ -23,7 +23,8 @@ def insert_credentials(nav, username, password, captchaKey):
         wait_and_fill(nav, By.ID, 'cap_text', captcha)
         nav.find_element(By.ID, 'btnEntrar').send_keys(Keys.RETURN)
         WebDriverWait(nav, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
-
+        logging.info("login efetuado com sucesso.")
+        
     except Exception as e:
         logging.error(f"Error inserting credentials.")
         box_mensagem = nav.find_element_by_class_name("colunaboxMensagemB")
