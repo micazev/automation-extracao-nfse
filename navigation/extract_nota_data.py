@@ -1,55 +1,74 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import logging
 import json
 
+
 def save_to_file(data, filename):
-    with open(filename, 'w', encoding='utf-8') as file:
+    with open(filename, 'a', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=2)
         file.write('\n') 
 
+def extract_data_from_table(table, labels_to_extract):
+    data_dict = {}
+
+    if len(labels_to_extract) == 3:
+        cell_iterator = iter(table.find_all('td', class_='impressaoTitulo'))
+        for cell in cell_iterator:
+            cell_text = cell.get_text().strip()
+            matching_label = next((label for label in labels_to_extract if cell_text.startswith(label)), None)
+            if matching_label:
+                value = cell_text[len(matching_label) + 1:].strip()
+                data_dict[matching_label] = value
+
+    else:
+        cell_iterator = iter(table.find_all('td'))
+        for cell in cell_iterator:
+            cell_text = cell.get_text().strip()
+
+            # Find a matching label from labels_to_extract
+            matching_label = next((label for label in labels_to_extract if cell_text.startswith(label)), None)
+
+            if matching_label:
+                value = cell_text[len(matching_label) + 1:].strip()
+                data_dict[matching_label] = value
+
+    return data_dict
+
+
 def extract_nota_data(nav, column_item_text):
-    combined_data = {}  
+    combined_filename = f"extracts/nota_{column_item_text}.txt"
 
     try:
         # Extracting details from the nota fiscal details page
         page_source = nav.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
-        labels_to_extract = ['Número da Nota', 'Data e Hora de Emissão', 'Código de Verificação',
-                             'Nome/Razão Social', 'CPF/CNPJ', 'Inscrição Municipal',
-                             'Endereço', 'Município', 'UF', 'Telefone']
+        target_text = "PRESTADOR DE SERVIÇOS"
+        nota_text = "Número da Nota"
 
-        for label in labels_to_extract:
-            label_element = soup.find('td', class_='impressaoLabel', string=lambda text: label in text)
-            if label_element:
-                data_element = label_element.find_next('td', class_='impressaoTitulo')
-                if not data_element:
-                    logging.info("checando span")
-                    # If not found, try finding the value within the same <tr>
-                    data_element = label_element.find_next('span', class_='impressaoCampo')
-                if data_element:
-                    data_value = data_element.text.strip()
-                    combined_data[label] = data_value
-                else:
-                    # If neither is found, try finding a <span> inside the current <td> with class 'impressaoCampo'
-                    span_element = label_element.find('span', class_='impressaoCampo')
-                    if span_element:
-                        data_value = span_element.text.strip()
-                        combined_data[label] = data_value
-                    else:
-                        # If neither <td class='impressaoTitulo'> nor <span class='impressaoCampo'> is found, set data_value to None
-                        combined_data[label] = None
+        labels_to_extract = ['Nome/Razão Social', 'CPF/CNPJ', 'Inscrição Municipal', 'Endereço', 'Município', 'UF', 'Telefone']
+        labels_nota = ['Número da Nota', 'Data e Hora de Emissão', 'Código de Verificação']
+
+        tables = soup.find_all('table', class_=['impressaoTabela', 'tamTab100'])
+
+        try:
+            tabela_prestador = next((table for table in tables if any(target_text in cell.get_text() for row in table.find_all('tr') for cell in row.find_all('td'))), None)
+
+            data_dict_prestador = extract_data_from_table(tabela_prestador, labels_to_extract)
+            save_to_file(data_dict_prestador, combined_filename)
+        except:
+            logging.error(f"erro ao extrair os dados do prestador: {e}")
+
+        try:
+            tabela_nota = next((table for table in tables if any(nota_text in cell.get_text() for row in table.find_all('tr') for cell in row.find_all('td'))), None)
+
+            data_dict_nota = extract_data_from_table(tabela_nota, labels_nota)
+            save_to_file(data_dict_nota, combined_filename)
+        except:
+            logging.error(f"erro ao extrair os dados da nota: {e}")
 
     except Exception as e:
         logging.error(f"Error in extract_nota_data: {e}")
-        return {}
 
     finally:
-        # Save extracted data for each label
-        combined_filename = f"extracts/nota_{column_item_text}.txt"
-        save_to_file(combined_data, combined_filename)
-        logging.info(f"All data saved to {combined_filename}")
         nav.close()

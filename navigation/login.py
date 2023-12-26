@@ -3,13 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from utils import retry_with_logging
 from twocaptcha import TwoCaptcha
 import logging
-import time
-import sys
-import os
+
 
 def insert_credentials(nav, username, password, captchaKey):
     try:
@@ -39,9 +35,7 @@ def wait_and_log(nav, by, identifier, timeout):
 def automated_captcha(captchaKey, captcha_image):
     logging.info(f"Ativando o solucionador de captcha.")
     print(f"Ativando o solucionador de captcha.")
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    api_key = os.getenv('APIKEY_2CAPTCHA', captchaKey)
-    solver = TwoCaptcha(api_key)
+    solver = TwoCaptcha(captchaKey)
     
     try:
         captcha = solver.normal(captcha_image)
