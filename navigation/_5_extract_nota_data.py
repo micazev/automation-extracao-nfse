@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 
 def extract_nota_data(nav, column_item_text, dados_nao_extraidos):
     combined_filename = f"extracts/nota_{column_item_text}.txt"
-    logging.info("Início da extração de dados.")
 
     try:
         page_source = nav.page_source

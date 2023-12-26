@@ -26,6 +26,21 @@ def load_config_data():
     with open(config_file_path, 'r') as json_file:
         return json.load(json_file)
 
+def load_recover_data():
+    file_path = "config/recover.json"
+    if os.path.getsize(file_path) > 0:
+        config_file_path = os.path.join(os.path.dirname(__file__), 'recover.json')
+        with open(config_file_path, 'r') as json_file:
+            return json.load(json_file)
+    else:
+        logging.info("Nada consta no arquivo de recuperação.")
+    
+def delete_old_captcha():
+    try:
+        os.remove("config/captcha.png")
+    except:
+        logging.warning(f"Erro ao deletar o arquivo de captcha.")
+
 # Configure webdriver
 def configure_webdriver():
     try:

@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from navigation.extract_nota_data import extract_nota_data
-from navigation.extracao_pdf import extrair_dados_pdf
+from navigation._5_extract_nota_data import extract_nota_data
 from utils import retry_with_logging, generate_random_number
 
 

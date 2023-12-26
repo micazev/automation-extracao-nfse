@@ -1,40 +1,38 @@
-# main.py
-import logging
-from config.config import load_config_data, configure_webdriver, processar_datas
-from navigation.login import insert_credentials
-from navigation.select_date_range import select_date_range
-from utils import retry_with_logging, navegar_notas_periodo
-from selenium.webdriver.common.by import By
-from twocaptcha import TwoCaptcha
 import time
+import logging
+from utils import retry_with_logging, write_recover_file
+from navigation._2_select_date_range import select_date_range
+from scripts.navegar_notas_periodo import navegar_notas_periodo
+from navigation._1_insert_credentials import insert_credentials
+from config.config import load_config_data, delete_old_captcha, configure_webdriver, processar_datas, load_recover_data
 
-    
-# Main
 if __name__ == "__main__":
     try:
+        delete_old_captcha()
         config_data = load_config_data()
         driver = configure_webdriver()
+        recover_data = load_recover_data()
 
         if driver:
             try:
                 logging.info("Início da automação")
                 driver.get('https://nfse.campinas.sp.gov.br/NotaFiscal/acessoSistema.php')
-
-                # Switch to the 'principal' frame - o site é encapsulado em um frame
+                # Switch to the 'principal' frame - O site é encapsulado em um frame
                 driver.switch_to.frame("principal")
-                # Login
                 retry_with_logging(insert_credentials, driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
-                # time.sleep(1200)
                 datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
                 for periodo in datas_processadas:
                     logging.info(f"Início da extração do período: {periodo}")
+                    # write_recover_file("periodo", str(periodo))
                     retry_with_logging(select_date_range, driver, periodo)
                     retry_with_logging(navegar_notas_periodo, driver)
                     logging.info(f"Fim da extração do período: {periodo}")
+                with open("config/recover.txt", 'w') as arquivo:
+                    pass
             except Exception as e:
                 logging.error(f"An error occurred: {e}")
             finally:
                 driver.quit()
-                logging.info("operação finalizada.")
+                logging.info("Operação finalizada.")
     except Exception as e:
         logging.error(f"An error occurred: {e}")

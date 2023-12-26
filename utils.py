@@ -1,5 +1,6 @@
-import re
+import sys
 import time
+import json
 import random
 import logging
 from time import sleep
@@ -7,8 +8,40 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException
 
+import json
+import os
+
+def write_recover_file(label, data):
+    file_path = "config/recover.json"
+
+    # Carrega os dados existentes, se o arquivo existir
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as json_file:
+            try:
+                existing_data = json.load(json_file)
+            except json.JSONDecodeError:
+                existing_data = []
+    else:
+        existing_data = []
+
+    # Procura por um objeto existente com a mesma label e o atualiza ou adiciona um novo
+    found = False
+    for entry in existing_data:
+        if entry.get("label") == label:
+            entry["data"] = data
+            found = True
+            break
+
+    if not found:
+        # Se a label não foi encontrada, adiciona um novo objeto ao final da lista
+        entry = {"label": label, "data": data}
+        existing_data.append(entry)
+
+    # Escreve todos os dados no arquivo
+    with open(file_path, 'w') as json_file:
+        json.dump(existing_data, json_file)
 
 def generate_random_number():
     return random.randint(2, 6)
@@ -28,39 +61,17 @@ def retry_with_logging(function, *args, **kwargs):
                 sleep(delay) 
             else:
                 logging.error("Max attempts reached. Unable to complete operation.")
-                raise  
-
-def verifica_paginacao(nav):
-    try:    
-        nav.find_element(By.XPATH, '//a[text()="Próximo"]').click()
-        logging.info(f'Passando para a próxima página.')
-        return True
-    except:
-        logging.info('Não há mais páginas para o período.')
-        return False
-
-def navegar_notas_periodo(driver):
-    nota_numbers = verifica_notas(driver)
-    navegar_pagina(driver, nota_numbers)
-    i = 2
-    while verifica_paginacao(driver): # se houver, ele já clica
-        logging.info(f"Processando página {i}")
-        navegar_pagina(driver, nota_numbers)
-        i =+ 1
-
-def navegar_pagina(driver, nota_numbers):
-    from navigation.click_each_nfse import click_each_nfse
-    for nota_number in nota_numbers:
-        logging.info(f"Processing nota {nota_number}")
-        click_each_nfse(driver, nota_number)
+                sys.exit(1)
+                # raise  
 
 def wait_and_click(nav, by, value):
     try:
         element = WebDriverWait(nav, 3).until(EC.visibility_of_element_located((by, value)))
         element.click()
-        time.sleep(3)  # Sleep for 3 seconds after clicking
-    except (NoSuchElementException, TimeoutException) as e:
-        logging.error(f"Error waiting and clicking on {by}: {value}: {e}")
+        return True
+    except Exception as e:
+        logging.error(f"Error clicking on {by}: {value}: {e}")
+        return False
 
 def select_dropdown(nav, control_id, value):
     try:
@@ -69,28 +80,24 @@ def select_dropdown(nav, control_id, value):
     except NoSuchElementException as e:
         logging.error(f"Error selecting dropdown {control_id}: {e}")
 
-def verifica_notas(nav):
-    # Wait for the "Nenhuma NFSe localizada" text to disappear
-    notas_carregaram = WebDriverWait(nav, 5).until(
-        EC.invisibility_of_element_located((By.XPATH, '//tr[@class="gridResultado1"]/td[contains(text(), "Nenhuma NFSe localizada.")]'))
-    )
-    # Se carregaram notas - primeira checagem
-    if notas_carregaram:
-        table_rows = nav.find_elements(By.XPATH, '//table[@border="0"]/tbody/tr[contains(@class, "gridResultado")]')
-        row_count = len(table_rows)
-        logging.info(f"Número de notas a serem processadas na página: {row_count}")
+def find_page(nav, url_pattern, url_atual):
+    try:
+        if url_pattern not in url_atual:
+            # nav.close()
+            abas = nav.window_handles
+            for aba in abas:
+                nav.switch_to.window(aba)
+                if url_atual != nav.current_url:
+                    return False
+                else:
+                    return True
+        else:
+            return True
+    except:
+        logging.error("A página desejada não foi encontrada.")
+        return False
 
-        # Se houver notas - checagem dupla
-        if row_count > 0:
-            nota_numbers = []
-            for row in table_rows:
-                nota_link = row.find_element(By.XPATH, './/td[@class="right"]/a[b]')
-                WebDriverWait(nav, 2).until(lambda nav: nota_link.text.strip())
-                nota_number = re.search(r'\b(\d+)\b', nota_link.find_element(By.TAG_NAME, 'b').text)
-                if nota_number:
-                    nota_numbers.append(nota_number.group(1))
-
-        logging.info(f"Notas a serem processdas: {nota_numbers}")
-    else:
-        logging.info("Não há notas para o período.")
-    return nota_numbers
+def wait_and_fill(nav, by, identifier, value):
+    element = WebDriverWait(nav, 10).until(EC.visibility_of_element_located((by, identifier)))
+    element.clear()
+    element.send_keys(value)
