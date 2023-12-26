@@ -1,14 +1,17 @@
-import logging
-from datetime import datetime, timedelta
-from selenium.webdriver.common.by import By
-from time import sleep
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 import re
 import time
+import random
+import logging
+from time import sleep
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+
+def generate_random_number():
+    return random.randint(2, 6)
 
 def retry_with_logging(function, *args, **kwargs):
     attempt = 0
@@ -27,33 +30,13 @@ def retry_with_logging(function, *args, **kwargs):
                 logging.error("Max attempts reached. Unable to complete operation.")
                 raise  
 
-def processar_datas(data_inicio, data_fim):
-    intervalo_meses = 6
-    formato_data = "%Y-%m"
-    data_inicio = datetime.strptime(data_inicio, formato_data)
-    data_fim = datetime.strptime(data_fim, formato_data)
-    
-    datas_processadas = []
-
-    while data_inicio < data_fim:
-        proxima_data = data_inicio + timedelta(days=30 * intervalo_meses)
-        
-        if proxima_data < data_fim:
-            datas_processadas.append((data_inicio.strftime(formato_data), proxima_data.strftime(formato_data)))
-        else:
-            datas_processadas.append((data_inicio.strftime(formato_data), data_fim.strftime(formato_data)))
-
-        data_inicio = proxima_data
-
-    return datas_processadas
-
 def verifica_paginacao(nav):
     try:    
         nav.find_element(By.XPATH, '//a[text()="Próximo"]').click()
         logging.info(f'Passando para a próxima página.')
         return True
     except:
-        logging.info('Há apenas uma página de notas para o período.')
+        logging.info('Não há mais páginas para o período.')
         return False
 
 def navegar_notas_periodo(driver):
@@ -64,7 +47,6 @@ def navegar_notas_periodo(driver):
         logging.info(f"Processando página {i}")
         navegar_pagina(driver, nota_numbers)
         i =+ 1
-    logging.info("")
 
 def navegar_pagina(driver, nota_numbers):
     from navigation.click_each_nfse import click_each_nfse

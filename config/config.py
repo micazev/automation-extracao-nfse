@@ -1,10 +1,12 @@
 # config.py
 import os
 import json 
+import logging
 from datetime import datetime
 from selenium import webdriver
+from datetime import datetime, timedelta
 from selenium.webdriver.chrome.options import Options
-import logging
+
 
 logs_folder = 'logs'
 os.makedirs(logs_folder, exist_ok=True)
@@ -12,7 +14,7 @@ log_file_path = os.path.join(logs_folder, f'navigation_{datetime.now().strftime(
 logging.basicConfig(
     filename=log_file_path,
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
     datefmt='%H:%M:%S'
 )
 
@@ -35,3 +37,23 @@ def configure_webdriver():
     except Exception as e:
         logging.error(f"Error configuring WebDriver: {e}")
         return None
+
+def processar_datas(data_inicio, data_fim):
+    intervalo_meses = 3
+    formato_data = "%Y-%m"
+    data_inicio = datetime.strptime(data_inicio, formato_data)
+    data_fim = datetime.strptime(data_fim, formato_data)
+    
+    datas_processadas = []
+
+    while data_inicio < data_fim:
+        proxima_data = data_inicio + timedelta(days=30 * intervalo_meses)
+        
+        if proxima_data < data_fim:
+            datas_processadas.append((data_inicio.strftime(formato_data), proxima_data.strftime(formato_data)))
+        else:
+            datas_processadas.append((data_inicio.strftime(formato_data), data_fim.strftime(formato_data)))
+
+        data_inicio = proxima_data
+
+    return datas_processadas

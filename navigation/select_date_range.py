@@ -36,7 +36,6 @@ def split_strings(data_inicio, data_fim):
 
 def insert_dates(nav, initial_month, initial_year, final_month, final_year):
     try:
-        logging.info("Start Filter Data Range and extraction")
         select_dropdown(nav, 'rMesCompetenciaCN', initial_month)
         select_dropdown(nav, 'rAnoCompetenciaCN', initial_year)
         select_dropdown(nav, 'rMesCompetenciaCN2', final_month)
@@ -44,7 +43,7 @@ def insert_dates(nav, initial_month, initial_year, final_month, final_year):
         nav.find_element(By.ID, 'btnConsultar').send_keys(Keys.RETURN)
 
     except (NoSuchElementException, TimeoutException) as e:
-        logging.error(f"Error inserting dates: {e}")
+        logging.error(f"Erro ao Selecionar datas no dropdown. {e}")
 
 
 
