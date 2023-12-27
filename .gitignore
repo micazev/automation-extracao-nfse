@@ -1,4 +1,5 @@
 config/input.json
+config/config_email.json
 logs
 anotacoes
 extracts

@@ -8,9 +8,19 @@ Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônic
 2. Especificar um intervalo de datas.
 3. Acessar as notas referentes ao período.
 4. Extrair os dados da nota e do prestador de serviço.
-5. Salvar as informações extraídas.
+5. Salvar os dados extraídos.
+<!-- 6. Dados são colocados em modelo XML
+6. Envia um e-mail com um reporte final -->
 
-## Estrutura de Pastas e Arquivos
+## Instruções de uso
+
+Após clonar o repositório é necessário criar o arquivos:
+config/input.json
+config/config_email.json
+logs
+extracts
+
+### Estrutura de Pastas e Arquivos
 
 - **\_init_py**
 - **gitignore**
@@ -48,7 +58,7 @@ Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônic
   - **navegar_pagina.py**
   - **verifica_paginacao.py**
 
-## Input
+### Modelo do Input
 
 ```json
 {
@@ -57,6 +67,15 @@ Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônic
   "usuario": "xx.xxx.xxx/xxxx-xx",
   "senha": "xx",
   "captchaKey": "xx"
+}
+```
+
+### Modelo da configuração de e-mail
+
+```json
+{
+  "email": "xx@gmail.com",
+  "senha": "xx"
 }
 ```
 

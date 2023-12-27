@@ -25,7 +25,6 @@ def extract_nota_data(nav, nota_number, extrair_dados):
         tabela_nota = tables[3]
         nota_data = extract_nota(tabela_nota)
         extracted_data.update(nota_data)
-        print(nota_data)
 
         save_to_file(extracted_data, filename)
         extrair_dados =  False
