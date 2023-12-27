@@ -17,8 +17,8 @@ def click_each_nfse(nav, nota_number):
 def try_extract(nav, main_window, nota_number, main_window_url_pattern):
     try:
         prosseguir = False
-        dados_nao_extraidos = True
-        while dados_nao_extraidos:
+        extrair_dados = True
+        while extrair_dados:
             rdm = generate_random_number()
             time.sleep(rdm)
             prosseguir = retry_with_logging(click_nota, nav, nota_number, main_window_url_pattern, main_window)
@@ -26,7 +26,7 @@ def try_extract(nav, main_window, nota_number, main_window_url_pattern):
                 prosseguir = process_new_window(nav, main_window)
                 if prosseguir:
                     url_atual = nav.current_url
-                    dados_nao_extraidos = extract_nota_data(nav, nota_number, dados_nao_extraidos)
+                    extrair_dados = extract_nota_data(nav, nota_number, extrair_dados)
         nav.switch_to.window(main_window)
         nav.switch_to.frame("principal")
     except Exception as e:

@@ -13,6 +13,13 @@ from selenium.common.exceptions import NoSuchElementException
 import json
 import os
 
+def save_to_file(data, filename):
+    try:
+        with open(filename, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=2)
+    except:
+        logging.error(f"Erro ao escrever o arquivo {filename}")
+
 def write_recover_file(label, data):
     file_path = "config/recover.json"
 
