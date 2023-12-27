@@ -22,10 +22,8 @@ def extract_nota_data(nav, nota_number, extrair_dados):
         extracted_data.update(prestador_data)
 
         # Dados da nota
-        labels_nota = ['Número da Nota', 'Data e Hora de Emissão', 'Código de Verificação']
         tabela_nota = tables[3]
-        print("estou aqui")
-        nota_data = extract_nota(tabela_nota, labels_nota)
+        nota_data = extract_nota(tabela_nota)
         extracted_data.update(nota_data)
         print(nota_data)
 
@@ -52,15 +50,12 @@ def extract_prestador(table, labels_to_extract):
             prestador_data[matching_label] = value
     return prestador_data
 
-def extract_nota(tabela_nota, labels_nota):
+def extract_nota(tabela_nota):
     nota_data = {}
-    print("estou aqui")
     linhas_tabela = tabela_nota.find_all('tr')
-    print(f"linhas tabela {linhas_tabela}")
     for i in range(0, len(linhas_tabela), 2):
         chave = linhas_tabela[i].text.strip()
         valor = linhas_tabela[i + 1].text.strip()
         nota_data[chave] = valor
-    print(f"nota data {nota_data}")
     return nota_data
 
