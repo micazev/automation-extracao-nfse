@@ -62,6 +62,5 @@ def extract_nota(tabela_nota, labels_nota):
         valor = linhas_tabela[i + 1].text.strip()
         nota_data[chave] = valor
     print(f"nota data {nota_data}")
-    time.sleep(1200)
     return nota_data
 
