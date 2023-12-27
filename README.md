@@ -4,11 +4,11 @@
 
 Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônica (NFSE) do município de Campinas. O processo é dividido nas seguintes etapas:
 
-1. Insira um CNPJ.
-2. Especifique um intervalo de datas.
-3. Acesse as notas referentes ao período.
-4. Extraia os dados da nota e do prestador de serviço.
-5. Salve as informações extraídas.
+1. Insirir um CNPJ.
+2. Especificar um intervalo de datas.
+3. Acessar as notas referentes ao período.
+4. Extrair os dados da nota e do prestador de serviço.
+5. Salvar as informações extraídas.
 
 ## Estrutura de Pastas e Arquivos
 
@@ -28,7 +28,7 @@ Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônic
 
 - **extracts**
 
-  - Onde a automação armazena as notas salvas com o nome **nota\_{numero_da_nota}**
+  - Pasta para armazenamento dos dados extraídos
 
 - **logs**
 
@@ -72,3 +72,11 @@ Esta automação simplifica a extração de Notas Fiscais de Serviço Eletrônic
 - O site aceita apenas extrações de 6 em 6 meses.
 - Recomenda-se a extração de 3 em 3 meses para evitar muitas paginações.
 - É possível alterar o intervalo de busca com a variável **intervalo_meses** em **processar_datas** dentro de **config/config.json**.
+
+### Extrair os dados
+
+- São extraídos os dados da nota e do prestador, salvos como **extracts/nota\_{numero_da_nota}.json**
+- Os dados extraídos são:
+  labels_nota = ['Número da Nota', 'Data e Hora de Emissão', 'Código de Verificação']
+  labels_prestador = ['Nome/Razão Social', 'CPF/CNPJ', 'Inscrição Municipal', 'Endereço', 'Município', 'UF', 'Telefone']
+- Podendo ser alterados diretamente do arquivo **navigation/\_5_extract_nota_data.py**
