@@ -4,6 +4,10 @@ from utils import retry_with_logging, write_recover_file
 from navigation._2_select_date_range import select_date_range
 from scripts.navegar_notas_periodo import navegar_notas_periodo
 from navigation._1_insert_credentials import insert_credentials
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+
 from config.config import load_config_data, delete_old_captcha, configure_webdriver, processar_datas, load_recover_data
 
 if __name__ == "__main__":
@@ -20,6 +24,8 @@ if __name__ == "__main__":
                 # Switch to the 'principal' frame - O site é encapsulado em um frame
                 driver.switch_to.frame("principal")
                 retry_with_logging(insert_credentials, driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
+                WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
+                logging.info("Login efetuado com sucesso")
                 datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
                 for periodo in datas_processadas:
                     logging.info(f"Início da extração do período: {periodo}")

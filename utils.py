@@ -68,8 +68,8 @@ def retry_with_logging(function, *args, **kwargs):
                 sleep(delay) 
             else:
                 logging.error("Max attempts reached. Unable to complete operation.")
-                sys.exit(1)
-                # raise  
+                raise Exception("Erro. Tentativas esgotadas.")
+
 
 def wait_and_click(nav, by, value):
     try:
