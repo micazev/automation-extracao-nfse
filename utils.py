@@ -20,36 +20,6 @@ def save_to_file(data, filename):
     except:
         logging.error(f"Erro ao escrever o arquivo {filename}")
 
-def write_recover_file(label, data):
-    file_path = "config/recover.json"
-
-    # Carrega os dados existentes, se o arquivo existir
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as json_file:
-            try:
-                existing_data = json.load(json_file)
-            except json.JSONDecodeError:
-                existing_data = []
-    else:
-        existing_data = []
-
-    # Procura por um objeto existente com a mesma label e o atualiza ou adiciona um novo
-    found = False
-    for entry in existing_data:
-        if entry.get("label") == label:
-            entry["data"] = data
-            found = True
-            break
-
-    if not found:
-        # Se a label não foi encontrada, adiciona um novo objeto ao final da lista
-        entry = {"label": label, "data": data}
-        existing_data.append(entry)
-
-    # Escreve todos os dados no arquivo
-    with open(file_path, 'w') as json_file:
-        json.dump(existing_data, json_file)
-
 def generate_random_number():
     return random.randint(2, 6)
 
@@ -108,3 +78,24 @@ def wait_and_fill(nav, by, identifier, value):
     element = WebDriverWait(nav, 10).until(EC.visibility_of_element_located((by, identifier)))
     element.clear()
     element.send_keys(value)
+
+def write_recover_file(label, data):
+    file_path = "config/recover.json"
+    
+    # Check if the file exists or is empty
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+        try:
+            with open(file_path, 'r') as file:
+                existing_data = json.load(file)
+        except json.JSONDecodeError:
+            # Handle the case when the file is not in valid JSON format
+            existing_data = {}
+    else:
+        existing_data = {}
+
+    # Update the existing data with the new label and data
+    existing_data[label] = data
+
+    # Write the updated data back to the file
+    with open(file_path, 'w') as file:
+        json.dump(existing_data, file, indent=2)

@@ -23,8 +23,11 @@ def get_log_file_path():
 
 def load_config_data():
     config_file_path = os.path.join(os.path.dirname(__file__), 'input.json')
-    with open(config_file_path, 'r') as json_file:
-        return json.load(json_file)
+    if os.path.exists(config_file_path):
+        with open(config_file_path, 'r') as json_file:
+            return json.load(json_file)
+    else:
+        return {}
 
 def load_recover_data():
     file_path = "config/recover.json"

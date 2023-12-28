@@ -26,10 +26,14 @@ if __name__ == "__main__":
                 retry_with_logging(insert_credentials, driver, config_data['usuario'], config_data['senha'], config_data["captchaKey"])
                 WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.LINK_TEXT, 'NFSe Recebidas')))
                 logging.info("Login efetuado com sucesso")
-                datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
+
+                if len(recover_data) > 0:
+                    datas_processadas = processar_datas(recover_data['periodo'][1], config_data['dataFim'])
+                else:
+                    datas_processadas = processar_datas(config_data['dataInicio'], config_data['dataFim'])
                 for periodo in datas_processadas:
                     logging.info(f"Início da extração do período: {periodo}")
-                    # write_recover_file("periodo", str(periodo))
+                    write_recover_file("periodo", str(periodo))
                     retry_with_logging(select_date_range, driver, periodo)
                     retry_with_logging(navegar_notas_periodo, driver)
                     logging.info(f"Fim da extração do período: {periodo}")
@@ -42,3 +46,6 @@ if __name__ == "__main__":
                 logging.info("Operação finalizada.")
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+    finally:
+        #limpar recovery data
+        logging.info("Operação finalizada com sucesso.")

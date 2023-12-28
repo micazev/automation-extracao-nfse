@@ -2,6 +2,7 @@ import logging
 from navigation._3_verifica_notas import verifica_notas
 from scripts.navegar_pagina import navegar_pagina 
 from scripts.verifica_paginacao import verifica_paginacao
+from config import load_recover_data
 
 def navegar_notas_periodo(driver):
     notas_processadas = []

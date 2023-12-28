@@ -9,5 +9,5 @@ def navegar_pagina(driver, nota_numbers):
         click_each_nfse(driver, nota_number)
         logging.info(f"Processada nota {nota_number}")
         notas_processadas.append(nota_number)
-        # write_recover_file("nota_number",nota_number)
+        write_recover_file("nota_number", nota_number)
     return notas_processadas
