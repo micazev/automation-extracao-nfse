@@ -1,7 +1,9 @@
-selenium            4.10.0
 anticaptchaofficial 1.0.59
 beautifulsoup4      4.12.2
 bs4                 0.0.1
 Pillow              10.1.0
+requests            2.31.0
+selenium            4.10.0
 
-Se windows, talvez seja necesário ChromeDriverManager da biblioteca webdriver_manager.chrome
+
+Quando no windows, talvez seja necesário ChromeDriverManager da biblioteca webdriver_manager.chrome

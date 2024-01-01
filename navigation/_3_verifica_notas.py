@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def verifica_notas(nav):
+def verifica_notas_na_pagina(nav):
     # Wait for the "Nenhuma NFSe localizada" text to disappear
     notas_carregaram = WebDriverWait(nav, 5).until(
         EC.invisibility_of_element_located((By.XPATH, '//tr[@class="gridResultado1"]/td[contains(text(), "Nenhuma NFSe localizada.")]'))

@@ -75,3 +75,12 @@ def processar_datas(data_inicio, data_fim):
         data_inicio = proxima_data
 
     return datas_processadas
+
+def limpar_json():
+    try:
+        with open('config/recover.json', 'w') as file:
+            json.dump({}, file, indent=2)
+        print(f'O arquivo config/recover.json foi limpo com sucesso.')
+
+    except Exception as e:
+        print(f'Ocorreu um erro ao limpar o arquivo JSON: {e}')
