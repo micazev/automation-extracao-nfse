@@ -1,6 +1,4 @@
 import logging
-from PIL import Image
-from io import BytesIO
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -52,45 +50,3 @@ def inserir_datas(nav, mes_inicial, ano_inicial, mes_final, ano_final):
 
     except (NoSuchElementException, TimeoutException) as e:
         logging.error(f"Erro ao selecionar datas no dropdown. {e}")
-
-def baixar_captcha(nav):
-    try:
-        # Aguarda a presença do elemento "captcha_image" e realiza o download da imagem
-        captcha_image = WebDriverWait(nav, 10).until(
-            EC.presence_of_element_located((By.ID, "captcha_image"))
-        )
-        captcha_image_data = captcha_image.screenshot_as_png
-        image = Image.open(BytesIO(captcha_image_data))
-        image.save("config/captcha.png")
-    except:
-        logging.error("Erro ao baixar imagem do captcha.")
-
-def resolver_captcha_automatizado(captchaKey):
-    try:
-        # Cria um solver de captcha e tenta resolver a imagem
-        solver = imagecaptcha()
-        solver.set_verbose(1)
-        solver.set_key(captchaKey)
-        solver.set_soft_id(0)
-        captcha_text = solver.solve_and_return_solution("config/captcha.png")
-    except Exception as e:
-        logging.error(f"Erro ao resolver o captcha: {e}")
-        captcha_text = None
-    return captcha_text
-
-def inserir_credenciais(nav, usuario, senha, captchaKey):
-    try:
-        # Preenche os campos de usuário e senha
-        wait_and_fill(nav, By.ID, 'rLogin', usuario)
-        wait_and_fill(nav, By.ID, 'rSenha', senha)
-        
-        # Baixa a imagem do captcha e a resolve automaticamente
-        retry_with_logging(baixar_captcha, nav)
-        captcha = resolver_captcha_automatizado(captchaKey)
-
-        # Preenche o campo de captcha com a solução obtida
-        wait_and_fill(nav, By.ID, 'cap_text', captcha)
-        nav.find_element(By.ID, 'btnEntrar').send_keys(Keys.RETURN)
-        
-    except:
-        logging.error(f"Erro no login.")
